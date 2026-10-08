@@ -10,8 +10,9 @@ jclip https://x.com/SmashJT/status/2107933367694205275
 jclip https://x.com/SmashJT/status/2107933367694205275 --mp3
 ```
 
-Output lands in `~/Videos/jclip/` (override with `JCLIP_DIR`). The full video is
-cached in `~/Videos/jclip/.cache/` so further clips from the same video are instant.
+Output lands in `~/Videos/` by default. Change it with `jclip --dir ~/Clips`
+(saved to `~/.config/jclip/dir`); the `JCLIP_DIR` env var overrides both. The full
+video is cached in `<dir>/.cache/` so further clips from the same video are instant.
 
 ## Install
 

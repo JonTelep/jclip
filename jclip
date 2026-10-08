@@ -2,12 +2,15 @@
 # jclip - clip a section of a YouTube or X/Twitter video to mp4 (or mp3).
 # usage: jclip <url> [<start> <end>] [--mp3]   e.g. jclip URL 0:20 1:20
 #        no start/end = full video
+#        jclip --dir <path>   set default output dir (default ~/Videos; env JCLIP_DIR overrides)
 set -euo pipefail
 
-OUT_DIR="${JCLIP_DIR:-$HOME/Videos/jclip}"
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/jclip/dir"
+[[ "${1:-}" == "--dir" && -n "${2:-}" ]] && { mkdir -p "${CONF%/*}"; realpath -m "$2" >"$CONF"; echo "jclip: output dir set to $(<"$CONF")"; exit 0; }
+OUT_DIR="${JCLIP_DIR:-$( [[ -s "$CONF" ]] && cat "$CONF" || echo "$HOME/Videos")}"
 CACHE="$OUT_DIR/.cache"
 
-[[ $# -ge 1 ]] || { sed -n '2,4p' "$0" | sed 's/^# //'; exit 1; }
+[[ $# -ge 1 ]] || { sed -n '2,5p' "$0" | sed 's/^# //'; exit 1; }
 url=$1 mp3=0; shift
 [[ "${*: -1}" == "--mp3" ]] && { mp3=1; set -- "${@:1:$#-1}"; }
 start=${1:-} end=${2:-}
