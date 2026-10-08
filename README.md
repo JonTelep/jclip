@@ -1,6 +1,6 @@
 # jclip
 
-Clip a section of a YouTube video to an mp4 (or mp3) in one command.
+Clip a section of a YouTube or X video to an mp4 (or mp3) in one command.
 
 ```
 jclip <youtube url> <start> <end> [--mp3]

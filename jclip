@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# jclip - clip a section of a YouTube video to mp4 (or mp3).
+# jclip - clip a section of a YouTube or X/Twitter video to mp4 (or mp3).
 # usage: jclip <url> <start> <end> [--mp3]   e.g. jclip URL 0:20 1:20
 set -euo pipefail
 
@@ -13,10 +13,12 @@ for t in yt-dlp ffmpeg; do command -v "$t" >/dev/null || { echo "jclip: missing 
 mkdir -p "$CACHE"
 
 # Download full video once per id; sectioned downloads truncate audio.
-id=$(yt-dlp --get-id "$url")
-title=$(yt-dlp --get-title "$url" | tr -c 'A-Za-z0-9._-' '_' | sed 's/_*$//' | cut -c1-60)
+# --playlist-items 1: tweets with several videos are a playlist; take the first.
+yt() { yt-dlp --playlist-items 1 "$@"; }
+id=$(yt --get-id "$url")
+title=$(yt --get-title "$url" | tr -c 'A-Za-z0-9._-' '_' | sed 's/_*$//' | cut -c1-60)
 full="$CACHE/$id.mp4"
-[[ -s "$full" ]] || yt-dlp -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b" --merge-output-format mp4 -o "$full" "$url"
+[[ -s "$full" ]] || yt -f "bv*[ext=mp4]+ba[ext=m4a]/bv*[ext=mp4]+ba/b[ext=mp4]/b" --merge-output-format mp4 -o "$full" "$url"
 
 tag="${start//:/m}-${end//:/m}"
 if (( mp3 )); then
