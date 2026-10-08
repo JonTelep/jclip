@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # jclip - clip a section of a YouTube or X/Twitter video to mp4 (or mp3).
-# usage: jclip <url> <start> <end> [--mp3]   e.g. jclip URL 0:20 1:20
+# usage: jclip <url> [<start> <end>] [--mp3]   e.g. jclip URL 0:20 1:20
+#        no start/end = full video
 set -euo pipefail
 
 OUT_DIR="${JCLIP_DIR:-$HOME/Videos/jclip}"
 CACHE="$OUT_DIR/.cache"
 
-[[ $# -ge 3 ]] || { sed -n '2,3p' "$0" | sed 's/^# //'; exit 1; }
-url=$1 start=$2 end=$3 mp3=0
-[[ "${4:-}" == "--mp3" ]] && mp3=1
+[[ $# -ge 1 ]] || { sed -n '2,4p' "$0" | sed 's/^# //'; exit 1; }
+url=$1 mp3=0; shift
+[[ "${*: -1}" == "--mp3" ]] && { mp3=1; set -- "${@:1:$#-1}"; }
+start=${1:-} end=${2:-}
 for t in yt-dlp ffmpeg; do command -v "$t" >/dev/null || { echo "jclip: missing $t" >&2; exit 1; }; done
 mkdir -p "$CACHE"
 
@@ -20,12 +22,14 @@ title=$(yt --get-title "$url" | tr -c 'A-Za-z0-9._-' '_' | sed 's/_*$//' | cut -
 full="$CACHE/$id.mp4"
 [[ -s "$full" ]] || yt -f "bv*[ext=mp4]+ba[ext=m4a]/bv*[ext=mp4]+ba/b[ext=mp4]/b" --merge-output-format mp4 -o "$full" "$url"
 
-tag="${start//:/m}-${end//:/m}"
-if (( mp3 )); then
-  out="$OUT_DIR/${title}_${tag}.mp3"
+if [[ -z $start ]]; then
+  (( mp3 )) && { out="$OUT_DIR/$title.mp3"; ffmpeg -y -loglevel error -stats -i "$full" -vn -c:a libmp3lame -q:a 2 "$out"; } \
+            || { out="$OUT_DIR/$title.mp4"; cp "$full" "$out"; }
+elif (( mp3 )); then
+  tag="${start//:/m}-${end//:/m}" out="$OUT_DIR/${title}_${tag}.mp3"
   ffmpeg -y -loglevel error -stats -ss "$start" -to "$end" -i "$full" -vn -c:a libmp3lame -q:a 2 "$out"
 else
-  out="$OUT_DIR/${title}_${tag}.mp4"
+  tag="${start//:/m}-${end//:/m}" out="$OUT_DIR/${title}_${tag}.mp4"
   ffmpeg -y -loglevel error -stats -ss "$start" -to "$end" -i "$full" -c:v libx264 -preset fast -crf 20 -c:a aac "$out"
 fi
 echo "$out"

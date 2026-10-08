@@ -1,10 +1,13 @@
 # jclip
 
 Clip a section of a YouTube or X video to an mp4 (or mp3) in one command.
+Omit the timestamps to grab the whole video.
 
 ```
-jclip <youtube url> <start> <end> [--mp3]
+jclip <url> [<start> <end>] [--mp3]
 jclip https://www.youtube.com/watch?v=9DlBcS70EEk 2:53 8:05
+jclip https://x.com/SmashJT/status/2107933367694205275
+jclip https://x.com/SmashJT/status/2107933367694205275 --mp3
 ```
 
 Output lands in `~/Videos/jclip/` (override with `JCLIP_DIR`). The full video is
