@@ -6,7 +6,7 @@
 set -euo pipefail
 
 CONF="${XDG_CONFIG_HOME:-$HOME/.config}/jclip/dir"
-[[ "${1:-}" == "--dir" && -n "${2:-}" ]] && { mkdir -p "${CONF%/*}"; realpath -m "$2" >"$CONF"; echo "jclip: output dir set to $(<"$CONF")"; exit 0; }
+[[ "${1:-}" == "--dir" && -n "${2:-}" ]] && { mkdir -p "${CONF%/*}" "$2"; (cd "$2" && pwd) >"$CONF"; echo "jclip: output dir set to $(<"$CONF")"; exit 0; }
 OUT_DIR="${JCLIP_DIR:-$( [[ -s "$CONF" ]] && cat "$CONF" || echo "$HOME/Videos")}"
 CACHE="$OUT_DIR/.cache"
 
