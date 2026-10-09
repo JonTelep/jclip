@@ -1,15 +1,17 @@
 # jclip
 
-Clip a section of a YouTube or X/Twitter video to mp4 or mp3 in one command.
+[![CI](https://github.com/JonTelep/jclip/actions/workflows/ci.yml/badge.svg)](https://github.com/JonTelep/jclip/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-```
+**Clip a section of a YouTube or X/Twitter video to mp4 or mp3 in one command.**
+
+```bash
 jclip https://www.youtube.com/watch?v=9DlBcS70EEk 2:53 8:05
 ```
 
 That's it. The clip lands in `~/Videos/`.
 
-<!-- demo: replace with your video link or gif -->
-[▶ Watch the demo](https://github.com/JonTelep/jclip)
+**Platforms:** Linux and macOS (both tested in CI). Windows via WSL2.
 
 ## Install
 
@@ -20,13 +22,14 @@ Requires `yt-dlp` and `ffmpeg`. Install them for your OS, then grab the script.
 | macOS | `brew install yt-dlp ffmpeg` |
 | Arch | `sudo pacman -S yt-dlp ffmpeg` |
 | Debian/Ubuntu | `sudo apt install yt-dlp ffmpeg` |
+| Fedora | `sudo dnf install yt-dlp ffmpeg` |
 | Windows | Use [WSL](https://learn.microsoft.com/windows/wsl/install), then follow the Linux steps |
 
-```
-curl -fsSL https://raw.githubusercontent.com/JonTelep/jclip/main/jclip -o ~/.local/bin/jclip && chmod +x ~/.local/bin/jclip
+```bash
+mkdir -p ~/.local/bin && curl -fsSL https://raw.githubusercontent.com/JonTelep/jclip/main/jclip -o ~/.local/bin/jclip && chmod +x ~/.local/bin/jclip
 ```
 
-Make sure `~/.local/bin` is on your `PATH`.
+Make sure `~/.local/bin` is on your `PATH`. To remove it, delete `~/.local/bin/jclip`.
 
 **Or clone it** (upgrade with `git pull`):
 

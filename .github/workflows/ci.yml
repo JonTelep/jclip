@@ -1,0 +1,13 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck jclip install.sh
+      - run: ./jclip 2>&1 | grep -q usage          # no args prints usage
+      - run: ./jclip --dir "$RUNNER_TEMP/clips" && [ "$(cat ~/.config/jclip/dir)" = "$RUNNER_TEMP/clips" ]
