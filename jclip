@@ -25,9 +25,12 @@ title=$(yt --get-title "$url" | tr -c 'A-Za-z0-9._-' '_' | sed 's/_*$//' | cut -
 full="$CACHE/$id.mp4"
 [[ -s "$full" ]] || yt -f "bv*[ext=mp4]+ba[ext=m4a]/bv*[ext=mp4]+ba/b[ext=mp4]/b" --merge-output-format mp4 -o "$full" "$url"
 
-if [[ -z $start ]]; then
-  (( mp3 )) && { out="$OUT_DIR/$title.mp3"; ffmpeg -y -loglevel error -stats -i "$full" -vn -c:a libmp3lame -q:a 2 "$out"; } \
-            || { out="$OUT_DIR/$title.mp4"; cp "$full" "$out"; }
+if [[ -z $start && $mp3 == 1 ]]; then
+  out="$OUT_DIR/$title.mp3"
+  ffmpeg -y -loglevel error -stats -i "$full" -vn -c:a libmp3lame -q:a 2 "$out"
+elif [[ -z $start ]]; then
+  out="$OUT_DIR/$title.mp4"
+  cp "$full" "$out"
 elif (( mp3 )); then
   tag="${start//:/m}-${end//:/m}" out="$OUT_DIR/${title}_${tag}.mp3"
   ffmpeg -y -loglevel error -stats -ss "$start" -to "$end" -i "$full" -vn -c:a libmp3lame -q:a 2 "$out"

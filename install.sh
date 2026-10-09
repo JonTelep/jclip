@@ -9,4 +9,4 @@ if ! command -v yt-dlp >/dev/null || ! command -v ffmpeg >/dev/null; then
   else echo "install yt-dlp and ffmpeg, then re-run"; exit 1; fi
 fi
 mkdir -p ~/.local/bin && ln -sf "$PWD/jclip" ~/.local/bin/jclip
-echo "installed: $(command -v jclip || echo "~/.local/bin/jclip (add ~/.local/bin to PATH)")"
+echo "installed: $(command -v jclip || echo "$HOME/.local/bin/jclip (add it to PATH)")"
