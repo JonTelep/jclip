@@ -9,5 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: shellcheck jclip install.sh
+        if: runner.os == 'Linux'
       - run: ./jclip 2>&1 | grep -q usage          # no args prints usage
       - run: ./jclip --dir "$RUNNER_TEMP/clips" && [ "$(cat ~/.config/jclip/dir)" = "$RUNNER_TEMP/clips" ]
