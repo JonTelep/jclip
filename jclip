@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # jclip - clip a section of a YouTube or X/Twitter video to mp4 (or mp3).
-# usage: jclip <url> [<start> <end>] [--mp3]   e.g. jclip URL 0:20 1:20
+# usage: jclip <url|file> [<start> <end>] [--mp3]   e.g. jclip URL 0:20 1:20
 #        no start/end = full video
 #        jclip --dir <path>   set default output dir (default ~/Videos; env JCLIP_DIR overrides)
 set -euo pipefail
@@ -20,10 +20,15 @@ mkdir -p "$CACHE"
 # Download full video once per id; sectioned downloads truncate audio.
 # --playlist-items 1: tweets with several videos are a playlist; take the first.
 yt() { yt-dlp --playlist-items 1 "$@"; }
-id=$(yt --get-id "$url")
-title=$(yt --get-title "$url" | tr -c 'A-Za-z0-9._-' '_' | sed 's/_*$//' | cut -c1-60)
-full="$CACHE/$id.mp4"
-[[ -s "$full" ]] || yt -f "bv*[ext=mp4]+ba[ext=m4a]/bv*[ext=mp4]+ba/b[ext=mp4]/b" --merge-output-format mp4 -o "$full" "$url"
+clean() { tr -c 'A-Za-z0-9._-' '_' | sed 's/_*$//' | cut -c1-60; }
+if [[ -f "$url" ]]; then  # local file: clip it directly, no download
+  full=$url title=$(basename "${url%.*}" | clean)
+else
+  id=$(yt --get-id "$url")
+  title=$(yt --get-title "$url" | clean)
+  full="$CACHE/$id.mp4"
+  [[ -s "$full" ]] || yt -f "bv*[ext=mp4]+ba[ext=m4a]/bv*[ext=mp4]+ba/b[ext=mp4]/b" --merge-output-format mp4 -o "$full" "$url"
+fi
 
 if [[ -z $start && $mp3 == 1 ]]; then
   out="$OUT_DIR/$title.mp3"
