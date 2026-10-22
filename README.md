@@ -43,7 +43,7 @@ git clone https://github.com/JonTelep/jclip && cd jclip && ./install.sh
 ## Usage
 
 ```
-jclip <url|file> [<start> <end>] [--mp3]
+jclip <url|file> [<start> [<end>]] [--mp3]
 jclip --dir <path>
 ```
 
@@ -53,6 +53,7 @@ jclip https://www.youtube.com/watch?v=9DlBcS70EEk 2:53 8:05 --mp3
 jclip https://x.com/SmashJT/status/2107933367694205275        # whole video
 jclip https://x.com/SmashJT/status/2107933367694205275 --mp3  # whole video as mp3
 jclip ~/footage/demo.mp4 0:05 0:50                            # local file
+jclip ~/footage/demo.mp4 0:01                                 # 0:01 to the end ("end" works too)
 ```
 
 Timestamps are anything ffmpeg accepts: `90`, `1:30`, `1:02:30`, `1:30.5`.

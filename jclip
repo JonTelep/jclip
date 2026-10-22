@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # jclip - clip a section of a YouTube or X/Twitter video to mp4 (or mp3).
-# usage: jclip <url|file> [<start> <end>] [--mp3]   e.g. jclip URL 0:20 1:20
-#        no start/end = full video
+# usage: jclip <url|file> [<start> [<end>]] [--mp3]   e.g. jclip URL 0:20 1:20
+#        no start/end = full video; no end (or "end") = start to the end
 #        jclip --dir <path>   set default output dir (default ~/Videos; env JCLIP_DIR overrides)
 set -euo pipefail
 
@@ -14,6 +14,9 @@ CACHE="$OUT_DIR/.cache"
 url=$1 mp3=0; shift
 [[ "${*: -1}" == "--mp3" ]] && { mp3=1; set -- "${@:1:$#-1}"; }
 start=${1:-} end=${2:-}
+[[ $end == end ]] && end=
+to=(); [[ -n $end ]] && to=(-to "$end")
+tag="${start//:/m}-${end:-end}" tag=${tag//:/m}
 for t in yt-dlp ffmpeg; do command -v "$t" >/dev/null || { echo "jclip: missing $t" >&2; exit 1; }; done
 mkdir -p "$CACHE"
 
@@ -37,10 +40,10 @@ elif [[ -z $start ]]; then
   out="$OUT_DIR/$title.mp4"
   cp "$full" "$out"
 elif (( mp3 )); then
-  tag="${start//:/m}-${end//:/m}" out="$OUT_DIR/${title}_${tag}.mp3"
-  ffmpeg -y -loglevel error -stats -ss "$start" -to "$end" -i "$full" -vn -c:a libmp3lame -q:a 2 "$out"
+  out="$OUT_DIR/${title}_${tag}.mp3"
+  ffmpeg -y -loglevel error -stats -ss "$start" ${to[@]+"${to[@]}"} -i "$full" -vn -c:a libmp3lame -q:a 2 "$out"
 else
-  tag="${start//:/m}-${end//:/m}" out="$OUT_DIR/${title}_${tag}.mp4"
-  ffmpeg -y -loglevel error -stats -ss "$start" -to "$end" -i "$full" -c:v libx264 -preset fast -crf 20 -c:a aac "$out"
+  out="$OUT_DIR/${title}_${tag}.mp4"
+  ffmpeg -y -loglevel error -stats -ss "$start" ${to[@]+"${to[@]}"} -i "$full" -c:v libx264 -preset fast -crf 20 -c:a aac "$out"
 fi
 echo "$out"
